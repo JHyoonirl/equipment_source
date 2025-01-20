@@ -4,6 +4,7 @@ from PyQt5.QtCore import QTimer
 from FT_SENSOR import FTSensor
 import sys
 import threading
+import argparse
 from pyqtgraph import PlotWidget  # 그래프를 위한 라이브러리
 
 
@@ -102,10 +103,10 @@ class SensorApp(QMainWindow):
                 self.force_data[i].pop(0)
             if len(self.torque_data[i]) >= self.threadhold:
                 self.torque_data[i].pop(0)
-            self.force_data[i].append(force[i])
-            self.torque_data[i].append(torque[i])
-            self.plot_forces[i].setData(self.force_data[i])
-            self.plot_torques[i].setData(self.torque_data[i])
+        self.force_data[i].append(force[i])
+        self.torque_data[2].append(torque[2])
+        self.plot_forces[i].setData(self.force_data[i])
+        self.plot_torques[2].setData(self.torque_data[2])
 
         # self.plot_force.setData(self.force_data[0])  # 평탄화하여 데이터 설정
         # self.plot_torque.setData(self.torque_data[0])
@@ -149,7 +150,11 @@ class Sensor:
 
 def main():
     app = QApplication(sys.argv)
-    sensor = Sensor()
+    parser = argparse.ArgumentParser(description="Control FT Sensor via CLI")
+    parser.add_argument('--port', type=str, default='COM8', help='Serial port to connect to')
+    args = parser.parse_args()
+
+    sensor = Sensor(port=args.port)
     sensor_thread = threading.Thread(target=sensor.data_process, daemon=True)
     sensor_thread.start()
     ex = SensorApp(sensor)

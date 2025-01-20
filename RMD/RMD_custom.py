@@ -2,6 +2,7 @@
 import can
 import os
 import time
+import traceback
 
 class RMD:
     def __init__(self, identifier):
@@ -70,11 +71,15 @@ class RMD:
         received_message : list
             Frame data received from the motor after receiving the command.
         """
-        message = can.Message(arbitration_id=self.identifier,
-                                data=data, is_extended_id=False)
-        self.bus.send(message)
-        time.sleep(delay)
-        received_message = self.bus.recv()
+        try:
+            message = can.Message(arbitration_id=self.identifier,
+                                    data=data, is_extended_id=False)
+            self.bus.send(message)
+            time.sleep(delay)
+            received_message = self.bus.recv()
+        except:
+            traceback_message = traceback.format_exc()
+            print('error' + traceback_message)
         return received_message
     
     def read_pid(self):
@@ -283,7 +288,7 @@ class RMD:
         torque_array = [0x00, 0x00]
         torque_array[0:2] = self.byteArray(torque_input,2)
         data_array =  self.raw_torque_closed_loop(torque_array).data
-        print(data_array)
+        # print(data_array)
         temperature = int(data_array[1])
         torque = int.from_bytes(data_array[2:4], byteorder='little', signed=True)
         speed = int.from_bytes(data_array[4:6], byteorder='little', signed=True)
