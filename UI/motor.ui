@@ -535,7 +535,7 @@
      <string>Setting</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="Pos_kp_2">
+   <widget class="QTextEdit" name="Neutral_angle">
     <property name="geometry">
      <rect>
       <x>120</x>
