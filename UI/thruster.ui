@@ -134,7 +134,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Turn ON thruster</string>
+     <string>set up</string>
     </property>
    </widget>
    <widget class="QPushButton" name="torque_btn">
@@ -147,7 +147,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Turn ON thruster</string>
+     <string>set up</string>
     </property>
    </widget>
   </widget>
