@@ -1,12 +1,13 @@
 from PyQt5.QtWidgets import QPushButton, QLabel, QApplication, QMainWindow
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from FT_SENSOR import FTSensor
+from FT_SENSOR_jh import FTSensor
 import sys
+import os
 import threading
-import argparse
 from pyqtgraph import PlotWidget  # 그래프를 위한 라이브러리
-
+print(os.getcwd())
+import argparse
 
 
 class SensorApp(QMainWindow):
@@ -34,7 +35,7 @@ class SensorApp(QMainWindow):
         self.plot_force_z = self.plot_force.plot(pen='b', name='Force_z')
         self.plot_forces = [self.plot_force_x, self.plot_force_y, self.plot_force_z]
         self.plot_force.setTitle("Force Readings")
-        # self.plot_force.setBackground("w")
+        self.plot_force.setBackground("w")
         self.plot_force.setYRange(-30, 30)
         self.plot_force.addLegend(offset=(10, 30))
 
@@ -44,13 +45,13 @@ class SensorApp(QMainWindow):
         self.plot_torques = [self.plot_torque_x, self.plot_torque_y, self.plot_torque_z]
         self.plot_torque.setTitle("Torque Readings")
         self.plot_torque.setYRange(-3, 3)
-        # self.plot_torque.setBackground("w")
+        self.plot_torque.setBackground("w")
         self.plot_torque.addLegend(offset=(10, 30))
 
         ### 타이머 설정 ###
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_data)
-        self.timer.start(30)  # 100ms 간격으로 업데이트
+        # self.timer.start(5)  # 100ms 간격으로 업데이트
         
         # 버튼 위젯 찾기
         self.btn_bias = self.findChild(QPushButton, 'Setbias')
@@ -103,10 +104,10 @@ class SensorApp(QMainWindow):
                 self.force_data[i].pop(0)
             if len(self.torque_data[i]) >= self.threadhold:
                 self.torque_data[i].pop(0)
-        self.force_data[i].append(force[i])
-        self.torque_data[2].append(torque[2])
-        self.plot_forces[i].setData(self.force_data[i])
-        self.plot_torques[2].setData(self.torque_data[2])
+            self.force_data[i].append(force[i])
+            self.torque_data[i].append(torque[i])
+            self.plot_forces[i].setData(self.force_data[i])
+            self.plot_torques[i].setData(self.torque_data[i])
 
         # self.plot_force.setData(self.force_data[0])  # 평탄화하여 데이터 설정
         # self.plot_torque.setData(self.torque_data[0])
@@ -148,17 +149,13 @@ class Sensor:
                 except Exception as e:
                     print(f"Error: {e}")
 
-def main():
-    app = QApplication(sys.argv)
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Control FT Sensor via CLI")
     parser.add_argument('--port', type=str, default='COM8', help='Serial port to connect to')
     args = parser.parse_args()
-
-    sensor = Sensor(port=args.port)
+    app = QApplication(sys.argv)
+    sensor = Sensor(args.port)
     sensor_thread = threading.Thread(target=sensor.data_process, daemon=True)
     sensor_thread.start()
     ex = SensorApp(sensor)
     sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    main()
